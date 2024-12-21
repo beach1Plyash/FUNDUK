@@ -1,0 +1,359 @@
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <string>
+#include <vector>
+using namespace std;
+
+struct Node {
+    int key;
+    string color;
+    Node* left, * right, * p;
+};
+
+
+void LeftRotation(Node*& root, Node* z) {
+    Node* parent = z->p;
+    Node* grand = parent->p;
+
+
+    parent->right = z->left;
+    if (z->left != nullptr) {
+        z->left->p = parent;
+    }
+
+    z->left = parent;
+    parent->p = z;
+
+    z->p = grand;
+    if (grand == nullptr) {
+        root = z; // Если родитель был корнем
+    }
+    else if (grand->left == parent) {
+        grand->left = z;
+    }
+    else {
+        grand->right = z;
+    }
+}
+
+
+void RightRotation(Node*& root, Node* z) {
+    Node* parent = z->p;
+    Node* grand = parent->p;
+
+
+    parent->left = z->right;
+    if (z->right != nullptr) {
+        z->right->p = parent;
+    }
+
+    z->right = parent;
+    parent->p = z;
+
+    z->p = grand;
+    if (grand == nullptr) {
+        root = z; // Если родитель был корнем
+    }
+    else if (grand->left == parent) {
+        grand->left = z;
+    }
+    else {
+        grand->right = z;
+    }
+}
+
+
+void BalanceInsert(Node*& root, Node* z) {
+    while (z != root and z->p != nullptr and z->p->color == "Red") {
+        Node* parent = z->p;
+        Node* grand = parent->p;
+
+        if (grand == nullptr) break;
+
+        if (parent == grand->left) {
+            Node* uncle = grand->right;
+
+            
+            if (uncle != nullptr and uncle->color == "Red") {
+                parent->color = "Black";
+                uncle->color = "Black";
+                grand->color = "Red";
+                z = grand;
+            }
+            else {
+                
+                if (z == parent->right) {
+                    LeftRotation(root, z);
+                    z = parent;
+                    parent = z->p;
+                }
+
+                
+                RightRotation(root, parent);
+                swap(parent->color, grand->color);
+                z = parent;
+            }
+        }
+        else {
+            Node* uncle = grand->left;
+
+            
+            if (uncle != nullptr and uncle->color == "Red") {
+                parent->color = "Black";
+                uncle->color = "Black";
+                grand->color = "Red";
+                z = grand;
+            }
+            else {
+                
+                if (z == parent->left) {
+                    RightRotation(root, z);
+                    z = parent;
+                    parent = z->p;
+                }
+
+                
+                LeftRotation(root, parent);
+                swap(parent->color, grand->color);
+                z = parent;
+            }
+        }
+    }
+
+    
+    root->color = "Black";
+}
+
+
+void InsertNode(Node*& root, int key) {
+    Node* y = nullptr;
+    Node* x = root;
+
+    while (x != nullptr) {
+        y = x;
+        if (key < x->key) {
+            x = x->left;
+        }
+        else {
+            x = x->right;
+        }
+    }
+
+    Node* z = new Node{ key, "Red", nullptr, nullptr, y };
+
+    if (y == nullptr) {
+        root = z;
+    }
+    else if (z->key < y->key) {
+        y->left = z;
+    }
+    else {
+        y->right = z;
+    }
+
+    BalanceInsert(root, z);
+}
+
+
+void BalanceDelete(Node*& root, Node* x) {
+    while (x != root and x->color == "Black") {
+        if (x == x->p->left) {
+            Node* w = x->p->right; // Брат x
+            if (w->color == "Red") {
+                w->color = "Black";
+                x->p->color = "Red";
+                LeftRotation(root, x->p);
+                w = x->p->right;
+            }
+            if (w->left->color == "Black" && w->right->color == "Black") {
+                w->color = "Red";
+                x = x->p;
+            }
+            else {
+                if (w->right->color == "Black") {
+                    w->left->color = "Black";
+                    w->color = "Red";
+                    RightRotation(root, w);
+                    w = x->p->right;
+                }
+                w->color = x->p->color;
+                x->p->color = "Black";
+                w->right->color = "Black";
+                LeftRotation(root, x->p);
+                x = root;
+            }
+        }
+        else {
+            Node* w = x->p->left; 
+            if (w->color == "Red") {
+                w->color = "Black";
+                x->p->color = "Red";
+                RightRotation(root, x->p);
+                w = x->p->left;
+            }
+            if (w->right->color == "Black" && w->left->color == "Black") {
+                w->color = "Red";
+                x = x->p;
+            }
+            else {
+                if (w->left->color == "Black") {
+                    w->right->color = "Black";
+                    w->color = "Red";
+                    LeftRotation(root, w);
+                    w = x->p->left;
+                }
+                w->color = x->p->color;
+                x->p->color = "Black";
+                w->left->color = "Black";
+                RightRotation(root, x->p);
+                x = root;
+            }
+        }
+    }
+
+    x->color = "Black";
+}
+
+
+void Deleting(Node*& root, int el) {
+    Node* x = root;
+    while (x != nullptr && x->key != el) {
+        if (x->key < el) {
+            x = x->right;
+        }
+        else {
+            x = x->left;
+        }
+    }
+    if (x == nullptr) {
+        cout << "No such element\n";
+        return;
+    }
+
+    Node* rigmin = x->right;
+    if (rigmin == nullptr) { 
+        if (x->p == nullptr) { 
+            root = x->left;
+            if (root != nullptr) {
+                root->color = "Black";
+            }
+        }
+        else if (x == x->p->left) {
+            x->p->left = x->left;
+        }
+        else {
+            x->p->right = x->left;
+        }
+        if (x->left != nullptr) {
+            x->left->p = x->p;
+        }
+        delete x;
+        return;
+    }
+    while (rigmin->left != nullptr) {
+        rigmin = rigmin->left;
+    }
+    if (rigmin->p != x) {
+        rigmin->p->left = rigmin->right;
+        if (rigmin->right != nullptr) {
+            rigmin->right->p = rigmin->p;
+        }
+        rigmin->right = x->right;
+        x->right->p = rigmin;
+    }
+    if (x->p == nullptr) { 
+        root = rigmin;
+    }
+    else if (x == x->p->left) {
+        x->p->left = rigmin;
+    }
+    else {
+        x->p->right = rigmin;
+    }
+    rigmin->p = x->p;
+    rigmin->left = x->left;
+    if (x->left != nullptr) {
+        x->left->p = rigmin;
+    }
+    rigmin->color = x->color; 
+    delete x;
+    if (rigmin->color == "Black") {
+        BalanceDelete(root, rigmin);
+    }
+}
+
+int CalculateBlackHeight(Node* root) {
+    if (root == nullptr) {
+        return 1;
+    }
+
+    int leftBlackHeight = CalculateBlackHeight(root->left);
+    int rightBlackHeight = CalculateBlackHeight(root->right);
+
+    if (leftBlackHeight == 0 or rightBlackHeight == 0 or leftBlackHeight != rightBlackHeight) {
+        return 0;
+    }
+
+    int blackHeight = leftBlackHeight;
+
+    if (root->color == "Black") {
+        blackHeight++;
+    }
+
+    return blackHeight;
+}
+
+void FrontPrint(Node* root) {
+    if (root != nullptr) {
+        cout << root->key << " color: " << root->color << '\n';
+        FrontPrint(root->left);
+        FrontPrint(root->right);
+    }
+}
+
+void ClearTree(Node*& root) {
+    if (root == nullptr) return;
+    ClearTree(root->left);
+    ClearTree(root->right);
+    delete root;
+    root = nullptr; 
+}
+void Find(Node*& root, int series, int number) {
+    int keyfind = series * 1000000 + number;
+    Node* x = root;
+    while (x != nullptr && x->key != keyfind) {
+        if (x->key < keyfind) {
+            x = x->right;
+        }
+        else {
+            x = x->left;
+        }
+    }
+    if (x != nullptr) {
+        cout << "Your Passport is in the database\n";
+    }
+    else {
+        cout << "You have no Passport LOL\n";
+    }
+}
+
+int main() {
+    int series,number;
+    std::ifstream File("C:\\Users\\Kirill\\Desktop\\Minecraft.txt");
+    if (!File.is_open()) {
+        std::cerr << "File is not open\n";
+        return 1;
+    }
+    Node* root = nullptr;
+    while (File >> series >> number) {
+        InsertNode(root,(series * 1000000) + number);
+    }
+    File.close();
+
+
+
+    cout << "\n\n\nEND";
+    ClearTree(root);
+    return 0;
+}
