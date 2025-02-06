@@ -16,6 +16,8 @@ void print_list(Elem* start) {
     std::cout << std::endl;
 }
 
+
+
 // Создание пустого списка
 Elem* create_list() {
     return nullptr;
