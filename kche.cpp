@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 #include "kche.h"
-#include "ring_list.h"
 
 KeyType nill_key = { 0, 0 };
 Node* nill = new Node(nill_key, nullptr, nullptr, nullptr, nullptr, black);
@@ -185,7 +184,7 @@ void rb_delete_fixup(Node*& T, Node*& x) {
 	}
 	x->color = black;
 }
-void straight_write(Node* root, int indent) {
+void print(Node* root, int indent) {
 	if (root != nill && root != nullptr) {
 		indent -= 2;
 		if (indent < 0) indent = 0;
@@ -194,8 +193,8 @@ void straight_write(Node* root, int indent) {
 		if (root->color == red) cl = 1;
 		std::cout << stuff << root->key.series << ' ' << root->key.number << ' ' << cl << ' ';
 		print_list(root->DuplicationList);
-		straight_write(root->LeftChild, indent - (2 + indent / 4));
-		straight_write(root->RightChild, indent + (2 + indent / 4));
+		print(root->LeftChild, indent - (2 + indent / 4));
+		print(root->RightChild, indent + (2 + indent / 4));
 	}
 }
 
@@ -331,4 +330,10 @@ Node* delete_in_tree(Node* root, KeyType key, int string_num) {
 		}
 	}
 	return root;
+}
+void straigh(Node* root) {
+	if (root == nullptr or root->key.series == 0) return;
+	std::cout << root->key.series << " "<< root->key.number<<'\n';
+	straigh(root->LeftChild);
+	straigh(root->RightChild);
 }

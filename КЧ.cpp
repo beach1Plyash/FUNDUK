@@ -26,7 +26,8 @@ int main() {
 	passport.series = 3000;
 	passport.number = 300000;
 	tree = delete_in_tree(tree, passport, 3);
-	straight_write(tree,70);
+	print(tree,60);
+	straigh(tree);
 	tree = clear_tree(tree);
 	file.close();
 	return 0;

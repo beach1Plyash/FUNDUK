@@ -35,7 +35,9 @@ Node* init(); // инициализация пустого дерева
 
 Node* insert_in_tree(Node* T, KeyType key, int string_num); // добавление в дерево
 
-void straight_write(Node* root, int indent); // печать
+void print(Node* root, int indent); // печать
+
+void straigh(Node* root);//Прямой вывод
 
 Node* search_in_tree(Node* T, KeyType key); // поиск узла в дереве
 
