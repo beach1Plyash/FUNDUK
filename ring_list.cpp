@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include "ring_list.h"
 
 // Печать списка
