@@ -1,4 +1,4 @@
-﻿#ifndef RING_LIST_H
+#ifndef RING_LIST_H
 #define RING_LIST_H
 
 struct Elem {
