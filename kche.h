@@ -1,4 +1,4 @@
-﻿#ifndef KCHE_H
+#ifndef KCHE_H
 #define KCHE_H
 #include "ring_list.h"
 
